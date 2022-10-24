@@ -12,6 +12,10 @@
     "build": "npm run clean && tsc",
     "pub": "git add . && git commit -m \"Updates\" && npm version patch && npm run build && npm publish --access=public"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/faizansayyed/ticketing-microservices/tree/main/common"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
