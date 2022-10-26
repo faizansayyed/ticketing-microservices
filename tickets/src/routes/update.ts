@@ -5,7 +5,7 @@ import {
   NotFoundError,
   requireAuth,
   NotAuthorizedError,
-} from "@faizansayyed/common-v2";
+} from "@faizansayyedorg/common-v2";
 import { Ticket } from "../models/ticket";
 
 const router = express.Router();
