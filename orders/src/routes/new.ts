@@ -42,22 +42,21 @@ router.post(
     }
 
     // Calculate an expiration date for this order
-    const expiration = new Date()
-    expiration.setSeconds(expiration.getSeconds() * EXPIRATION_WINDOW_SECONDS)
+    const expiration = new Date();
+    expiration.setSeconds(expiration.getSeconds() + EXPIRATION_WINDOW_SECONDS);
 
     // Build the order and save it to the database
     const order = Order.build({
       userId: req.currentUser!.id,
       status: OrderStatus.Created,
       expiresAt: expiration,
-      ticket
-    })
-
+      ticket,
+    });
     await order.save();
 
     // Publish an event saying that an order was created
 
-    res.status(201).send({});
+    res.status(201).send(order);
   }
 );
 

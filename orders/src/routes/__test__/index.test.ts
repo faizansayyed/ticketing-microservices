@@ -1,97 +1,55 @@
 import request from 'supertest';
 import { app } from '../../app';
+import { Order } from '../../models/order';
 import { Ticket } from '../../models/ticket';
-import { natsWrapper } from '../../nats-wrapper';
 
-it('has a route handler listening to /api/tickets for post requests', async () => {
-    const response = await request(app).post('/api/tickets').send({});
+const buildTicket = async () => {
+  const ticket = Ticket.build({
+    title: 'concert',
+    price: 20,
+  });
+  await ticket.save();
 
-    expect(response.status).not.toEqual(404);
-});
+  return ticket;
+};
 
-it('can only be accessed if the user is signed in', async () => {
-    await request(app).post('/api/tickets').send({}).expect(401);
-});
+it('fetches orders for an particular user', async () => {
+  // Create three tickets
+  const ticketOne = await buildTicket();
+  const ticketTwo = await buildTicket();
+  const ticketThree = await buildTicket();
 
-it('returns a status other than 401 if the user is signed in', async () => {
-    const response = await request(app)
-        .post('/api/tickets')
-        .set('Cookie', global.signin())
-        .send({});
+  const userOne = global.signin();
+  const userTwo = global.signin();
+  // Create one order as User #1
+  await request(app)
+    .post('/api/orders')
+    .set('Cookie', userOne)
+    .send({ ticketId: ticketOne.id })
+    .expect(201);
 
-    expect(response.status).not.toEqual(401);
-});
+  // Create two orders as User #2
+  const { body: orderOne } = await request(app)
+    .post('/api/orders')
+    .set('Cookie', userTwo)
+    .send({ ticketId: ticketTwo.id })
+    .expect(201);
+  const { body: orderTwo } = await request(app)
+    .post('/api/orders')
+    .set('Cookie', userTwo)
+    .send({ ticketId: ticketThree.id })
+    .expect(201);
 
-it('returns an error if an invalid title is provided', async () => {
-    await request(app)
-        .post('/api/tickets')
-        .set('Cookie', global.signin())
-        .send({
-            title: '',
-            price: 10,
-        })
-        .expect(400);
+  // Make request to get orders for User #2
+  const response = await request(app)
+    .get('/api/orders')
+    .set('Cookie', userTwo)
+    .expect(200);
 
-    await request(app)
-        .post('/api/tickets')
-        .set('Cookie', global.signin())
-        .send({
-            price: 10,
-        })
-        .expect(400);
-});
-
-it('returns an error if an invalid price is provided', async () => {
-    await request(app)
-        .post('/api/tickets')
-        .set('Cookie', global.signin())
-        .send({
-            title: 'asldkjf',
-            price: -10,
-        })
-        .expect(400);
-
-    await request(app)
-        .post('/api/tickets')
-        .set('Cookie', global.signin())
-        .send({
-            title: 'laskdfj',
-        })
-        .expect(400);
-});
-
-it('creates a ticket with valid inputs', async () => {
-    let tickets = await Ticket.find({});
-    expect(tickets.length).toEqual(0);
-
-    const title = 'asldkfj';
-
-    await request(app)
-        .post('/api/tickets')
-        .set('Cookie', global.signin())
-        .send({
-            title,
-            price: 20,
-        })
-        .expect(201);
-
-    tickets = await Ticket.find({});
-    expect(tickets.length).toEqual(1);
-    expect(tickets[0].price).toEqual(20);
-    expect(tickets[0].title).toEqual(title);
-});
-
-it('publishes an event', async () => {
-    const title = 'asldkfj';
-
-    await request(app)
-        .post('/api/tickets')
-        .set('Cookie', global.signin())
-        .send({
-            title,
-            price: 20,
-        })
-        .expect(201);
-
-    expect(natsWrapper.client.publish).toHaveBeenCalled();
+  // Make sure we only got the orders for User #2
+  expect(response.body.length).toEqual(2);
+  expect(response.body[0].id).toEqual(orderOne.id);
+  expect(response.body[1].id).toEqual(orderTwo.id);
+  expect(response.body[0].ticket.id).toEqual(ticketTwo.id);
+  expect(response.body[1].ticket.id).toEqual(ticketThree.id);
 });
