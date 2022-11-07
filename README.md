@@ -72,3 +72,5 @@ chrome browser --> https://ticketing.dev/
 
 type: **thisisunsafe** in the browser window with security warning.
 <br/>
+
+//also integrated to mac
