@@ -34,8 +34,7 @@ const ticketSchema = new mongoose.Schema(
       required: true,
     },
     orderId: {
-      type: String,
-      required: true,
+      type: String
     }
   },
   {

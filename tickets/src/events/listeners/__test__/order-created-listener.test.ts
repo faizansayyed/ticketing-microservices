@@ -8,7 +8,7 @@ import { Ticket } from '../../../models/ticket';
 const setup = async () => {
   // Create an instance of the listener
   const listener = new OrderCreatedListener(natsWrapper.client);
-
+  
   // Create and save a ticket
   const ticket = Ticket.build({
     title: 'concert',
@@ -40,7 +40,7 @@ const setup = async () => {
 
 it('sets the userId of the ticket', async () => {
   const { listener, ticket, data, msg } = await setup();
-
+  
   await listener.onMessage(data, msg);
 
   const updatedTicket = await Ticket.findById(ticket.id);
