@@ -1,7 +1,7 @@
+import mongoose from 'mongoose';
 import request from 'supertest';
 import { app } from '../../app';
 import { Ticket } from '../../models/ticket';
-import mongoose from 'mongoose'
 
 it('fetches the order', async () => {
   // Create a ticket
@@ -12,13 +12,17 @@ it('fetches the order', async () => {
   });
   await ticket.save();
 
+  console.log({ ticket })
   const user = global.signin();
+  console.log({ user })
   // make a request to build an order with this ticket
   const { body: order } = await request(app)
     .post('/api/orders')
     .set('Cookie', user)
     .send({ ticketId: ticket.id })
     .expect(201);
+
+  console.log({ order })
 
   // make request to fetch the order
   const { body: fetchedOrder } = await request(app)
