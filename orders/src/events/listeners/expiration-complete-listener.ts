@@ -1,15 +1,15 @@
-import { ExpirationCompleteEvet, Listener, OrderStatus, Subjects } from "@faizansayyedorg/common-v2";
+import { ExpirationCompleteEvent, Listener, OrderStatus, Subjects } from "@faizansayyedorg/common-v2";
 import { Message } from "node-nats-streaming";
 import { Order } from "../../models/order";
 import { OrderCancelledPublisher } from "../publishers/oreder-cancelled-publisher";
 import { queueGroupName } from "./queue-group-name";
 
 
-export class ExpirationCompleteListener extends Listener<ExpirationCompleteEvet>{
+export class ExpirationCompleteListener extends Listener<ExpirationCompleteEvent>{
     queueGroupName = queueGroupName;
     subject: Subjects.ExpirationComplete = Subjects.ExpirationComplete;
 
-    async onMessage(data: ExpirationCompleteEvet['data'], msg: Message) {
+    async onMessage(data: ExpirationCompleteEvent['data'], msg: Message) {
         const order = await Order.findById(data.orderId)
 
         if (!order) {
