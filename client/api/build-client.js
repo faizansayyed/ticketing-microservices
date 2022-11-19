@@ -4,7 +4,6 @@ const buildClient = ({ req }) => {
   try {
     if (typeof window === "undefined") {
       // We are on the server
-      console.log("here in undefined ============",req.headers)
       return axios.create({
         baseURL:
           "http://ingress-nginx-controller.ingress-nginx.svc.cluster.local",
