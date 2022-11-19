@@ -25,8 +25,6 @@ it('returns a 401 when purchasing an order that doesnt belong to the user', asyn
   });
   await order.save();
 
-  console.log({order})
-
   await request(app)
     .post('/api/payments')
     .set('Cookie', global.signin())
