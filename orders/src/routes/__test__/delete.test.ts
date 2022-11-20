@@ -8,7 +8,7 @@ import mongoose from 'mongoose'
 it('marks an order as cancelled', async () => {
   // create a ticket with Ticket Model
   const ticket = Ticket.build({
-    id: mongoose.Types.ObjectId().toHexString(),
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 20,
   });
@@ -38,7 +38,7 @@ it('marks an order as cancelled', async () => {
 it('emits a order cancelled event', async () => {
   // create a ticket with Ticket Model
   const ticket = Ticket.build({
-    id: mongoose.Types.ObjectId().toHexString(),
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 20,
   });

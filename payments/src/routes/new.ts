@@ -35,9 +35,12 @@ router.post(
     }
 
     const charge = await stripe.charges.create({
-      currency: "inr",
       amount: order.price,
+      currency: 'inr',
+      source: token,
     })
+
+    console.log({ charge })
 
     const payment = Payment.build({
       orderId,

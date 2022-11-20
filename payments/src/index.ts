@@ -20,6 +20,9 @@ const start = async () => {
   if (!process.env.NATS_CLUSTER_ID) {
     throw new Error('NATS_CLUSTER_ID must be defined');
   }
+  if (!process.env.STRIPE_KEY) {
+    throw new Error('STRIPE_KEY must be defined');
+  }
 
   try {
     await natsWrapper.connect(
@@ -36,9 +39,10 @@ const start = async () => {
 
     new OrderCancelledListener(natsWrapper.client).listen();
     new OrderCreatedListener(natsWrapper.client).listen();
-    
+
     await mongoose.connect(process.env.MONGO_URI, {});
     console.log('Connected to MongoDb');
+    console.log('Connected to Stripe' + process.env.STRIPE_KEY);
   } catch (err) {
     console.error(err);
   }
