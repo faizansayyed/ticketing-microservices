@@ -19,9 +19,11 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  const collections = await mongoose.connection.db.collections();
-
-  for (let collection of collections) {
+  jest.clearAllMocks();
+  const collections = await mongoose.connection.collections;
+ 
+  for (const key in collections) {
+    const collection = collections[key];
     await collection.deleteMany({});
   }
 });
@@ -31,7 +33,8 @@ afterAll(async () => {
     await mongo.stop();
   }
   await mongoose.connection.close();
-  await new Promise<void>(resolve => setTimeout(() => resolve(), 1000)); // avoid jest open handle error
+  // await new Promise<void>(resolve => setTimeout(() => resolve(), 4000)); // avoid jest open handle error
+
 });
 
 global.signin = async () => {
