@@ -31,6 +31,7 @@ afterAll(async () => {
     await mongo.stop();
   }
   await mongoose.connection.close();
+  await new Promise<void>(resolve => setTimeout(() => resolve(), 1000)); // avoid jest open handle error
 });
 
 global.signin = async () => {
